@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="마크다운 서식을 지우고 읽기 편한 일반 텍스트로 바로 정리하세요. 입력 내용은 서버로 전송되지 않고 브라우저에서만 처리됩니다.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#f1effa">
+  <meta name="color-scheme" content="light">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="마크다운 지우개">
+  <meta property="og:description" content="서식은 지우고, 내용만 깨끗하게.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="마크다운 지우개">
+  <meta name="twitter:description" content="서식은 지우고, 내용만 깨끗하게.">
+  <title>마크다운 지우개 — 서식은 지우고, 내용만 깨끗하게</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236f50d8'/%3E%3Cpath d='m19 38 16-20a6 6 0 0 1 9 0l4 4a6 6 0 0 1 0 8L34 47H24l-5-4a4 4 0 0 1 0-5Z' fill='white'/%3E%3Cpath d='m28 47 8-10-10-8-8 10a5 5 0 0 0 1 7l1 1h8Z' fill='%23d8cff9'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="마크다운 지우개 홈">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img">
+          <path d="m7.2 15.7 6.6-8.2a2.7 2.7 0 0 1 4-.2l1.1 1.1a2.7 2.7 0 0 1 .2 3.7l-6.4 7.7H8.8l-1.4-1.2a2 2 0 0 1-.2-2.9Z"/>
+          <path class="brand-mark-tip" d="m8.6 19.8-1.4-1.2a2 2 0 0 1-.2-2.9l2.4-3 4.1 3.4-3 3.7H8.6Z"/>
+        </svg>
+      </span>
+      <span>마크다운 지우개</span>
+    </a>
+
+    <p class="local-note">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10m-10 0h11a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-7A1.5 1.5 0 0 1 6.5 10Z"/>
+      </svg>
+      브라우저에서만 처리
+    </p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">CLEAN TEXT</p>
+      <h1 id="page-title">마크다운 지우개</h1>
+      <p class="tagline">서식은 지우고, 내용만 깨끗하게.</p>
+      <p class="hero-copy">마크다운을 붙여넣으면 읽기 편한 일반 텍스트로 바로 정리됩니다.</p>
+    </section>
+
+    <section class="workspace" aria-label="마크다운을 일반 텍스트로 변환">
+      <article class="editor-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-step">01</span>
+            <h2>마크다운</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="button button-quiet" id="sampleButton" type="button">예시</button>
+            <button class="button button-secondary" id="pasteButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 5h6m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m-6 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m2 0h1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1"/>
+              </svg>
+              붙여넣기
+            </button>
+          </div>
+        </div>
+
+        <label class="sr-only" for="markdownInput">지울 마크다운 입력</label>
+        <textarea id="markdownInput" spellcheck="false" autofocus placeholder="# 제목&#10;&#10;**굵게**, [링크](https://example.com), 표와 목록이 포함된 마크다운을 붙여넣으세요."></textarea>
+
+        <div class="panel-footer">
+          <span id="inputCount">0자</span>
+          <button class="text-button" id="clearButton" type="button" disabled>전체 지우기</button>
+        </div>
+      </article>
+
+      <div class="flow-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="m8 5 7 7-7 7"/></svg>
+      </div>
+
+      <article class="editor-panel result-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-step">02</span>
+            <h2>클린 텍스트</h2>
+          </div>
+          <button class="button button-primary" id="copyButton" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="8" y="8" width="11" height="11" rx="2"/>
+              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+            </svg>
+            복사
+          </button>
+        </div>
+
+        <label class="sr-only" for="cleanOutput">정리된 일반 텍스트 결과</label>
+        <textarea id="cleanOutput" readonly placeholder="정리된 텍스트가 여기에 표시됩니다."></textarea>
+
+        <div class="panel-footer">
+          <span id="outputCount">0자</span>
+          <span class="auto-label">
+            <span class="status-dot" aria-hidden="true"></span>
+            자동 변환
+          </span>
+        </div>
+      </article>
+    </section>
+
+    <section class="trust-strip" aria-label="서비스 특징">
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 4v6m10-6v6M5 13h5m4 0h5M5 17h3m4 0h7"/></svg>
+        <span><strong>주요 서식 정리</strong> 제목, 강조, 링크, 표, 코드</span>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg>
+        <span><strong>설치 없이 즉시</strong> 붙여넣고 바로 복사</span>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14v5l3 2"/></svg>
+        <span><strong>기록하지 않음</strong> 새로고침하면 입력 내용 삭제</span>
+      </div>
+    </section>
+
+    <section class="about" aria-labelledby="about-title">
+      <p class="section-kicker">HOW IT WORKS</p>
+      <h2 id="about-title">마크다운 기호만 말끔하게 지웁니다</h2>
+      <p>제목의 <code>#</code>, 강조의 <code>**</code>, 링크 주소와 표 구분선은 지우고 실제 문장은 남깁니다. 목록, 체크 항목, 코드 내용은 읽기 쉬운 일반 텍스트 형태로 보존합니다.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>마크다운 지우개</span>
+    <span>입력한 내용은 어디에도 전송되지 않습니다.</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
