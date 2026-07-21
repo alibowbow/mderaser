@@ -3,20 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="마크다운 서식을 지우고 읽기 편한 일반 텍스트로 바로 정리하세요. 입력 내용은 서버로 전송되지 않고 브라우저에서만 처리됩니다.">
+  <meta name="description" content="ChatGPT, Gemini, Claude 답변의 마크다운 문법을 제거해 SNS, 메신저, 문서에 붙여넣기 좋은 일반 텍스트로 변환하세요. 브라우저에서만 처리됩니다.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#f1effa">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="https://alibowbow.github.io/mderaser/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:title" content="마크다운 지우개">
-  <meta property="og:description" content="서식은 지우고, 내용만 깨끗하게.">
+  <meta property="og:site_name" content="마크다운 지우개">
+  <meta property="og:title" content="마크다운 지우개 | AI 답변을 깔끔한 일반 텍스트로">
+  <meta property="og:description" content="ChatGPT·Gemini·Claude 답변에 따라오는 마크다운 기호를 지우고 어디든 편하게 붙여넣으세요.">
   <meta property="og:url" content="https://alibowbow.github.io/mderaser/">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="마크다운 지우개">
-  <meta name="twitter:description" content="서식은 지우고, 내용만 깨끗하게.">
-  <title>마크다운 지우개 — 서식은 지우고, 내용만 깨끗하게</title>
+  <meta name="twitter:title" content="마크다운 지우개 | AI 답변을 깔끔한 일반 텍스트로">
+  <meta name="twitter:description" content="ChatGPT·Gemini·Claude 답변의 마크다운 문법을 제거해 SNS, 메신저, 문서에 바로 붙여넣으세요.">
+  <title>마크다운 지우개 | ChatGPT·Gemini·Claude 답변 문법 제거</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "마크다운 지우개",
+    "url": "https://alibowbow.github.io/mderaser/",
+    "description": "ChatGPT, Gemini, Claude 답변의 마크다운 문법을 제거해 SNS, 메신저, 문서에 붙여넣기 좋은 일반 텍스트로 변환합니다.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "ko-KR",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "KRW"
+    }
+  }
+  </script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236f50d8'/%3E%3Cpath d='m19 38 16-20a6 6 0 0 1 9 0l4 4a6 6 0 0 1 0 8L34 47H24l-5-4a4 4 0 0 1 0-5Z' fill='white'/%3E%3Cpath d='m28 47 8-10-10-8-8 10a5 5 0 0 0 1 7l1 1h8Z' fill='%23d8cff9'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./app.js"></script>
@@ -46,7 +65,7 @@
       <p class="eyebrow">CLEAN TEXT</p>
       <h1 id="page-title">마크다운 지우개</h1>
       <p class="tagline">서식은 지우고, 내용만 깨끗하게.</p>
-      <p class="hero-copy">마크다운을 붙여넣으면 읽기 편한 일반 텍스트로 바로 정리됩니다.</p>
+      <p class="hero-copy">ChatGPT·Gemini·Claude 답변을 SNS, 메신저나 문서에 옮길 때 따라오는 <code>#</code>, <code>**</code>, <code>[링크]</code> 같은 마크다운 기호를 한 번에 지웁니다.</p>
     </section>
 
     <section class="workspace" aria-label="마크다운을 일반 텍스트로 변환">
@@ -57,7 +76,12 @@
             <h2>마크다운</h2>
           </div>
           <div class="panel-actions">
-            <button class="button button-quiet" id="sampleButton" type="button">예시</button>
+            <button class="button button-clear" id="clearButton" type="button" aria-label="마크다운 입력 내용 비우기" title="입력창의 내용을 모두 지웁니다" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16m-10 4v6m4-6v6M9 7l1-3h4l1 3m3 0-1 13H7L6 7"/>
+              </svg>
+              입력 비우기
+            </button>
             <button class="button button-secondary" id="pasteButton" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M9 5h6m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m-6 0a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m2 0h1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1"/>
@@ -72,7 +96,7 @@
 
         <div class="panel-footer">
           <span id="inputCount">0자</span>
-          <button class="text-button" id="clearButton" type="button" disabled>전체 지우기</button>
+          <button class="text-button" id="sampleButton" type="button">예시 불러오기</button>
         </div>
       </article>
 
@@ -111,11 +135,11 @@
     <section class="trust-strip" aria-label="서비스 특징">
       <div>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 4v6m10-6v6M5 13h5m4 0h5M5 17h3m4 0h7"/></svg>
-        <span><strong>주요 서식 정리</strong> 제목, 강조, 링크, 표, 코드</span>
+        <span><strong>AI 답변 깔끔하게</strong> ChatGPT·Gemini·Claude</span>
       </div>
       <div>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg>
-        <span><strong>설치 없이 즉시</strong> 붙여넣고 바로 복사</span>
+        <span><strong>어디든 붙여넣기</strong> SNS·메신저·문서 작업</span>
       </div>
       <div>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14v5l3 2"/></svg>
@@ -125,8 +149,8 @@
 
     <section class="about" aria-labelledby="about-title">
       <p class="section-kicker">HOW IT WORKS</p>
-      <h2 id="about-title">마크다운 기호만 말끔하게 지웁니다</h2>
-      <p>제목의 <code>#</code>, 강조의 <code>**</code>, 링크 주소와 표 구분선은 지우고 실제 문장은 남깁니다. 목록, 체크 항목, 코드 내용은 읽기 쉬운 일반 텍스트 형태로 보존합니다.</p>
+      <h2 id="about-title">AI 답변에 따라오는 마크다운 기호만 지웁니다</h2>
+      <p>ChatGPT, Gemini, Claude 답변을 SNS, 카카오톡 같은 메신저, 이메일이나 문서 편집기에 옮길 때 제목의 <code>#</code>, 강조의 <code>**</code>, 링크 주소와 표 구분선은 지우고 실제 문장은 남깁니다. 목록, 체크 항목과 코드 내용은 읽기 쉬운 일반 텍스트로 보존합니다.</p>
     </section>
   </main>
 
