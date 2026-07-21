@@ -162,10 +162,21 @@ main {
 }
 
 .hero-copy {
+  max-width: 700px;
   margin: 10px 0 0;
+  margin-inline: auto;
   color: var(--ink-soft);
   font-size: 15px;
   line-height: 1.7;
+}
+
+.hero-copy code {
+  padding: 1px 5px;
+  color: var(--accent-dark);
+  background: rgba(112, 81, 214, 0.08);
+  border-radius: 5px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.88em;
 }
 
 .workspace {
@@ -279,6 +290,18 @@ main {
 .button-quiet:hover {
   color: var(--ink);
   background: #f4f2fa;
+}
+
+.button-clear {
+  color: #a54658;
+  background: #fff7f8;
+  border-color: #f1dce1;
+}
+
+.button-clear:hover:not(:disabled) {
+  color: #8f3347;
+  background: #fff0f3;
+  border-color: #e9c8d0;
 }
 
 .button-secondary {
@@ -616,7 +639,7 @@ footer span:first-child {
 
   .button {
     min-height: 36px;
-    padding-inline: 10px;
+    padding-inline: 9px;
     font-size: 12px;
   }
 
