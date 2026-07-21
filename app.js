@@ -262,7 +262,7 @@ const message = "코드 내용은 그대로 남아요.";
     markdownInput.value = "";
     updateResult();
     markdownInput.focus();
-    showToast("모두 지웠어요.");
+    showToast("입력 내용을 비웠어요.");
   });
 
   copyButton.addEventListener("click", async function () {
