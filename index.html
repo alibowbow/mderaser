@@ -120,13 +120,13 @@
         </div>
 
         <label class="sr-only" for="cleanOutput">정리된 일반 텍스트 결과</label>
-        <textarea id="cleanOutput" readonly placeholder="정리된 텍스트가 여기에 표시됩니다."></textarea>
+        <textarea id="cleanOutput" aria-describedby="outputEditHint" placeholder="정리된 텍스트가 여기에 표시됩니다. 복사하기 전에 바로 수정할 수 있어요."></textarea>
 
         <div class="panel-footer">
           <span id="outputCount">0자</span>
-          <span class="auto-label">
+          <span class="auto-label" id="outputEditHint" aria-live="polite">
             <span class="status-dot" aria-hidden="true"></span>
-            자동 변환
+            <span id="outputModeText">자동 변환 · 직접 수정 가능</span>
           </span>
         </div>
       </article>
