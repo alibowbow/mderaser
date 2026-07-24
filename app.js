@@ -185,6 +185,8 @@ const message = "코드 내용은 그대로 남아요.";
   const cleanOutput = document.getElementById("cleanOutput");
   const inputCount = document.getElementById("inputCount");
   const outputCount = document.getElementById("outputCount");
+  const outputModeLabel = document.getElementById("outputEditHint");
+  const outputModeText = document.getElementById("outputModeText");
   const sampleButton = document.getElementById("sampleButton");
   const pasteButton = document.getElementById("pasteButton");
   const clearButton = document.getElementById("clearButton");
@@ -196,6 +198,11 @@ const message = "코드 내용은 그대로 남아요.";
     return value.length.toLocaleString("ko-KR") + "자";
   }
 
+  function setOutputMode(edited) {
+    outputModeLabel.classList.toggle("edited", edited);
+    outputModeText.textContent = edited ? "직접 수정됨" : "자동 변환 · 직접 수정 가능";
+  }
+
   function updateResult() {
     const source = markdownInput.value;
     const result = stripMarkdown(source);
@@ -205,6 +212,7 @@ const message = "코드 내용은 그대로 남아요.";
     outputCount.textContent = formatCount(result);
     clearButton.disabled = source.length === 0;
     copyButton.disabled = result.length === 0;
+    setOutputMode(false);
   }
 
   function showToast(message) {
@@ -231,6 +239,13 @@ const message = "코드 내용은 그대로 남아요.";
   }
 
   markdownInput.addEventListener("input", updateResult);
+
+  cleanOutput.addEventListener("input", function () {
+    const result = cleanOutput.value;
+    outputCount.textContent = formatCount(result);
+    copyButton.disabled = result.length === 0;
+    setOutputMode(true);
+  });
 
   sampleButton.addEventListener("click", function () {
     markdownInput.value = SAMPLE_MARKDOWN;
