@@ -14,9 +14,17 @@
   <meta property="og:title" content="마크다운 지우개 | AI 답변을 깔끔한 일반 텍스트로">
   <meta property="og:description" content="ChatGPT·Gemini·Claude 답변에 따라오는 마크다운 기호를 지우고 어디든 편하게 붙여넣으세요.">
   <meta property="og:url" content="https://alibowbow.github.io/mderaser/">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://alibowbow.github.io/mderaser/assets/og-image.png">
+  <meta property="og:image:secure_url" content="https://alibowbow.github.io/mderaser/assets/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="마크다운 기호가 깔끔한 일반 텍스트로 지워지는 모습">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="마크다운 지우개 | AI 답변을 깔끔한 일반 텍스트로">
   <meta name="twitter:description" content="ChatGPT·Gemini·Claude 답변의 마크다운 문법을 제거해 SNS, 메신저, 문서에 바로 붙여넣으세요.">
+  <meta name="twitter:image" content="https://alibowbow.github.io/mderaser/assets/og-image.png">
+  <meta name="twitter:image:alt" content="마크다운 지우개 · 서식은 지우고 내용만 깨끗하게">
   <title>마크다운 지우개 | ChatGPT·Gemini·Claude 답변 문법 제거</title>
   <script type="application/ld+json">
   {
@@ -24,6 +32,7 @@
     "@type": "WebApplication",
     "name": "마크다운 지우개",
     "url": "https://alibowbow.github.io/mderaser/",
+    "image": "https://alibowbow.github.io/mderaser/assets/og-image.png",
     "description": "ChatGPT, Gemini, Claude 답변의 마크다운 문법을 제거해 SNS, 메신저, 문서에 붙여넣기 좋은 일반 텍스트로 변환합니다.",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Any",
@@ -66,10 +75,35 @@
       <h1 id="page-title">마크다운 지우개</h1>
       <p class="tagline">서식은 지우고, 내용만 깨끗하게.</p>
       <p class="hero-copy">ChatGPT·Gemini·Claude 답변을 SNS, 메신저나 문서에 옮길 때 따라오는 <code>#</code>, <code>**</code>, <code>[링크]</code> 같은 마크다운 기호를 한 번에 지웁니다.</p>
+      <div class="hero-demo" aria-label="마크다운이 일반 텍스트로 바뀌는 예시">
+        <div class="demo-side demo-before">
+          <span>BEFORE</span>
+          <code id="heroBefore">**오늘의 일정**</code>
+        </div>
+        <span class="demo-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="m7.2 15.7 6.6-8.2a2.7 2.7 0 0 1 4-.2l1.1 1.1a2.7 2.7 0 0 1 .2 3.7l-6.4 7.7H8.8l-1.4-1.2a2 2 0 0 1-.2-2.9Z"/>
+            <path class="demo-eraser-tip" d="m8.6 19.8-1.4-1.2a2 2 0 0 1-.2-2.9l2.4-3 4.1 3.4-3 3.7H8.6Z"/>
+          </svg>
+        </span>
+        <div class="demo-side demo-after">
+          <span>AFTER</span>
+          <strong id="heroAfter">오늘의 일정</strong>
+        </div>
+      </div>
     </section>
 
-    <section class="workspace" aria-label="마크다운을 일반 텍스트로 변환">
-      <article class="editor-panel">
+    <section class="workspace" id="workspace" data-mobile-view="source" aria-label="마크다운을 일반 텍스트로 변환">
+      <div class="mobile-view-switch" role="tablist" aria-label="편집 화면 전환">
+        <button class="mobile-tab active" id="sourceTabButton" type="button" role="tab" aria-selected="true" aria-controls="sourcePanel" data-view="source">
+          원문
+        </button>
+        <button class="mobile-tab" id="resultTabButton" type="button" role="tab" aria-selected="false" aria-controls="resultPanel" data-view="result" tabindex="-1">
+          결과
+        </button>
+      </div>
+
+      <article class="editor-panel source-panel" id="sourcePanel">
         <div class="panel-header">
           <div class="panel-title-wrap">
             <span class="panel-step">01</span>
@@ -92,7 +126,7 @@
         </div>
 
         <label class="sr-only" for="markdownInput">지울 마크다운 입력</label>
-        <textarea id="markdownInput" spellcheck="false" autofocus placeholder="# 제목&#10;&#10;**굵게**, [링크](https://example.com), 표와 목록이 포함된 마크다운을 붙여넣으세요."></textarea>
+        <textarea id="markdownInput" spellcheck="false" placeholder="# 제목&#10;&#10;**굵게**, [링크](https://example.com), 표와 목록이 포함된 마크다운을 붙여넣으세요."></textarea>
 
         <div class="panel-footer">
           <span id="inputCount">0자</span>
@@ -100,27 +134,56 @@
         </div>
       </article>
 
-      <div class="flow-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="m8 5 7 7-7 7"/></svg>
+      <div class="flow-mark" id="flowMark" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path class="flow-eraser" d="m6.8 15.6 7-8.6a2.8 2.8 0 0 1 4.1-.2l1.2 1.2a2.8 2.8 0 0 1 .2 3.8l-6.6 8H8.5l-1.5-1.3a2 2 0 0 1-.2-2.9Z"/>
+          <path class="flow-tip" d="m8.5 19.8-1.5-1.3a2 2 0 0 1-.2-2.9l2.5-3.1 4.3 3.5-3.1 3.8h-2Z"/>
+        </svg>
+        <span class="erase-particle particle-one"></span>
+        <span class="erase-particle particle-two"></span>
       </div>
 
-      <article class="editor-panel result-panel">
+      <article class="editor-panel result-panel" id="resultPanel">
         <div class="panel-header">
           <div class="panel-title-wrap">
             <span class="panel-step">02</span>
             <h2>클린 텍스트</h2>
           </div>
-          <button class="button button-primary" id="copyButton" type="button" disabled>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="8" y="8" width="11" height="11" rx="2"/>
-              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
-            </svg>
-            복사
-          </button>
+          <div class="panel-actions result-actions">
+            <button class="button button-reset" id="resetOutputButton" type="button" title="직접 수정하기 전 자동 변환 결과로 되돌립니다" hidden disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6M4 4v4.6h4.6"/>
+              </svg>
+              자동 변환본
+            </button>
+            <button class="button button-primary copy-button" id="copyButton" type="button" disabled>
+              <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2"/>
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+              </svg>
+              <svg class="copy-check" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 12 4.2 4.2L19 6.5"/>
+              </svg>
+              <span class="copy-label">복사</span>
+            </button>
+          </div>
         </div>
 
         <label class="sr-only" for="cleanOutput">정리된 일반 텍스트 결과</label>
         <textarea id="cleanOutput" aria-describedby="outputEditHint" placeholder="정리된 텍스트가 여기에 표시됩니다. 복사하기 전에 바로 수정할 수 있어요."></textarea>
+
+        <div class="mobile-copy-bar">
+          <button class="button button-primary copy-button" id="mobileCopyButton" type="button" disabled>
+            <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="8" y="8" width="11" height="11" rx="2"/>
+              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+            </svg>
+            <svg class="copy-check" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m5 12 4.2 4.2L19 6.5"/>
+            </svg>
+            <span class="copy-label">결과 복사</span>
+          </button>
+        </div>
 
         <div class="panel-footer">
           <span id="outputCount">0자</span>
@@ -159,6 +222,9 @@
     <span>입력한 내용은 어디에도 전송되지 않습니다.</span>
   </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastMessage"></span>
+    <button id="toastAction" type="button" hidden>되돌리기</button>
+  </div>
 </body>
 </html>

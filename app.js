@@ -183,6 +183,9 @@ const message = "코드 내용은 그대로 남아요.";
 
   const markdownInput = document.getElementById("markdownInput");
   const cleanOutput = document.getElementById("cleanOutput");
+  const workspace = document.getElementById("workspace");
+  const sourcePanel = document.getElementById("sourcePanel");
+  const resultPanel = document.getElementById("resultPanel");
   const inputCount = document.getElementById("inputCount");
   const outputCount = document.getElementById("outputCount");
   const outputModeLabel = document.getElementById("outputEditHint");
@@ -191,37 +194,213 @@ const message = "코드 내용은 그대로 남아요.";
   const pasteButton = document.getElementById("pasteButton");
   const clearButton = document.getElementById("clearButton");
   const copyButton = document.getElementById("copyButton");
+  const mobileCopyButton = document.getElementById("mobileCopyButton");
+  const resetOutputButton = document.getElementById("resetOutputButton");
+  const sourceTabButton = document.getElementById("sourceTabButton");
+  const resultTabButton = document.getElementById("resultTabButton");
+  const flowMark = document.getElementById("flowMark");
   const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toastMessage");
+  const toastAction = document.getElementById("toastAction");
+  const heroDemo = document.querySelector(".hero-demo");
+  const heroBefore = document.getElementById("heroBefore");
+  const heroAfter = document.getElementById("heroAfter");
+  const copyButtons = [copyButton, mobileCopyButton];
+  const mobileWorkspaceQuery = window.matchMedia("(max-width: 860px)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const HERO_EXAMPLES = [
+    { before: "**오늘의 일정**", after: "오늘의 일정" },
+    { before: "# 회의 메모", after: "회의 메모" },
+    { before: "[예약 링크](https://example.com)", after: "예약 링크" },
+    { before: "- 확인할 내용", after: "• 확인할 내용" }
+  ];
+
   let toastTimer;
+  let copyResetTimer;
+  let eraseTimer;
+  let heroTimer;
+  let heroIndex = 0;
+  let outputEdited = false;
+  let lastSourceValue = "";
+  let mobileView = "source";
 
   function formatCount(value) {
     return value.length.toLocaleString("ko-KR") + "자";
   }
 
   function setOutputMode(edited) {
+    outputEdited = edited;
     outputModeLabel.classList.toggle("edited", edited);
     outputModeText.textContent = edited ? "직접 수정됨" : "자동 변환 · 직접 수정 가능";
+    resetOutputButton.hidden = !edited;
+    resetOutputButton.disabled = !edited;
+    resultPanel.classList.toggle("has-edited-output", edited);
   }
 
-  function updateResult() {
-    const source = markdownInput.value;
+  function resetCopyState() {
+    window.clearTimeout(copyResetTimer);
+    copyButtons.forEach(function (button) {
+      button.classList.remove("copied");
+      const label = button.querySelector(".copy-label");
+      label.textContent = button === mobileCopyButton ? "결과 복사" : "복사";
+    });
+  }
+
+  function setCopyDisabled(disabled) {
+    copyButtons.forEach(function (button) {
+      button.disabled = disabled;
+    });
+    if (disabled) resetCopyState();
+  }
+
+  function showCopySuccess() {
+    window.clearTimeout(copyResetTimer);
+    copyButtons.forEach(function (button) {
+      button.classList.add("copied");
+      button.querySelector(".copy-label").textContent = "복사됨";
+    });
+    copyResetTimer = window.setTimeout(resetCopyState, 1400);
+  }
+
+  function triggerEraseAnimation() {
+    if (reducedMotionQuery.matches || !cleanOutput.value) return;
+
+    window.clearTimeout(eraseTimer);
+    flowMark.classList.remove("is-erasing");
+    workspace.classList.remove("is-erasing");
+    void workspace.offsetWidth;
+    flowMark.classList.add("is-erasing");
+    workspace.classList.add("is-erasing");
+    eraseTimer = window.setTimeout(function () {
+      flowMark.classList.remove("is-erasing");
+      workspace.classList.remove("is-erasing");
+    }, 560);
+  }
+
+  function renderResult(source, options) {
+    const settings = options || {};
     const result = stripMarkdown(source);
 
     cleanOutput.value = result;
     inputCount.textContent = formatCount(source);
     outputCount.textContent = formatCount(result);
     clearButton.disabled = source.length === 0;
-    copyButton.disabled = result.length === 0;
+    setCopyDisabled(result.length === 0);
     setOutputMode(false);
+    lastSourceValue = source;
+
+    if (settings.animate !== false && result.length > 0) {
+      triggerEraseAnimation();
+    }
   }
 
-  function showToast(message) {
+  function captureState(sourceOverride) {
+    return {
+      source: typeof sourceOverride === "string" ? sourceOverride : markdownInput.value,
+      output: cleanOutput.value,
+      edited: outputEdited,
+      mobileView: mobileView
+    };
+  }
+
+  function restoreState(snapshot) {
+    markdownInput.value = snapshot.source;
+    cleanOutput.value = snapshot.output;
+    inputCount.textContent = formatCount(snapshot.source);
+    outputCount.textContent = formatCount(snapshot.output);
+    clearButton.disabled = snapshot.source.length === 0;
+    setCopyDisabled(snapshot.output.length === 0);
+    setOutputMode(snapshot.edited);
+    lastSourceValue = snapshot.source;
+    setMobileView(snapshot.mobileView || "source");
+  }
+
+  function hideToast() {
+    toast.classList.remove("show");
+    toastAction.hidden = true;
+    toastAction.onclick = null;
+  }
+
+  function showToast(message, options) {
+    const settings = options || {};
     window.clearTimeout(toastTimer);
-    toast.textContent = message;
+    toastMessage.textContent = message;
+    toastAction.hidden = !settings.actionLabel;
+
+    if (settings.actionLabel) {
+      toastAction.textContent = settings.actionLabel;
+      toastAction.onclick = function () {
+        window.clearTimeout(toastTimer);
+        toastAction.hidden = true;
+        toastAction.onclick = null;
+        settings.onAction();
+      };
+    } else {
+      toastAction.onclick = null;
+    }
+
     toast.classList.add("show");
-    toastTimer = window.setTimeout(function () {
-      toast.classList.remove("show");
-    }, 1800);
+    toastTimer = window.setTimeout(hideToast, settings.duration || (settings.actionLabel ? 5000 : 1800));
+  }
+
+  function showUndoToast(message, snapshot) {
+    showToast(message, {
+      actionLabel: "되돌리기",
+      duration: 5000,
+      onAction: function () {
+        restoreState(snapshot);
+        showToast("이전 내용으로 되돌렸어요.");
+      }
+    });
+  }
+
+  function setMobileView(view, options) {
+    const settings = options || {};
+    mobileView = view === "result" ? "result" : "source";
+    workspace.dataset.mobileView = mobileView;
+
+    const sourceActive = mobileView === "source";
+    sourceTabButton.classList.toggle("active", sourceActive);
+    resultTabButton.classList.toggle("active", !sourceActive);
+    sourceTabButton.setAttribute("aria-selected", String(sourceActive));
+    resultTabButton.setAttribute("aria-selected", String(!sourceActive));
+    sourceTabButton.tabIndex = sourceActive ? 0 : -1;
+    resultTabButton.tabIndex = sourceActive ? -1 : 0;
+
+    if (mobileWorkspaceQuery.matches) {
+      sourcePanel.setAttribute("role", "tabpanel");
+      resultPanel.setAttribute("role", "tabpanel");
+      sourcePanel.setAttribute("aria-labelledby", "sourceTabButton");
+      resultPanel.setAttribute("aria-labelledby", "resultTabButton");
+      sourcePanel.setAttribute("aria-hidden", String(!sourceActive));
+      resultPanel.setAttribute("aria-hidden", String(sourceActive));
+      if (settings.focus) {
+        (sourceActive ? markdownInput : cleanOutput).focus();
+      }
+    } else {
+      sourcePanel.removeAttribute("role");
+      resultPanel.removeAttribute("role");
+      sourcePanel.removeAttribute("aria-labelledby");
+      resultPanel.removeAttribute("aria-labelledby");
+      sourcePanel.removeAttribute("aria-hidden");
+      resultPanel.removeAttribute("aria-hidden");
+    }
+  }
+
+  function applySource(value, options) {
+    const settings = options || {};
+    const previous = captureState();
+    const hadContent = previous.source.length > 0 || previous.output.length > 0;
+
+    markdownInput.value = value;
+    renderResult(value);
+    if (settings.showResult) setMobileView("result");
+
+    if (hadContent && settings.undoMessage) {
+      showUndoToast(settings.undoMessage, previous);
+    } else if (settings.message) {
+      showToast(settings.message);
+    }
   }
 
   async function copyText(value) {
@@ -234,24 +413,56 @@ const message = "코드 내용은 그대로 남아요.";
     cleanOutput.select();
     const copied = document.execCommand("copy");
     cleanOutput.setSelectionRange(0, 0);
-    markdownInput.focus();
+    cleanOutput.focus();
     if (!copied) throw new Error("copy failed");
   }
 
-  markdownInput.addEventListener("input", updateResult);
+  async function handleCopy() {
+    if (!cleanOutput.value) return;
+
+    try {
+      await copyText(cleanOutput.value);
+      showCopySuccess();
+      if (navigator.vibrate) navigator.vibrate(18);
+      showToast("클린 텍스트를 복사했어요.");
+    } catch (_error) {
+      cleanOutput.focus();
+      cleanOutput.select();
+      showToast("결과를 선택했어요. Ctrl+C로 복사해 주세요.");
+    }
+  }
+
+  function cycleHeroExample() {
+    heroDemo.classList.add("changing");
+    window.setTimeout(function () {
+      heroIndex = (heroIndex + 1) % HERO_EXAMPLES.length;
+      heroBefore.textContent = HERO_EXAMPLES[heroIndex].before;
+      heroAfter.textContent = HERO_EXAMPLES[heroIndex].after;
+      heroDemo.classList.remove("changing");
+    }, 190);
+  }
+
+  markdownInput.addEventListener("input", function () {
+    const overwrittenEdit = outputEdited ? captureState(lastSourceValue) : null;
+    renderResult(markdownInput.value);
+    if (overwrittenEdit) {
+      showUndoToast("직접 수정한 결과가 새 변환본으로 바뀌었어요.", overwrittenEdit);
+    }
+  });
 
   cleanOutput.addEventListener("input", function () {
     const result = cleanOutput.value;
     outputCount.textContent = formatCount(result);
-    copyButton.disabled = result.length === 0;
+    setCopyDisabled(result.length === 0);
     setOutputMode(true);
   });
 
   sampleButton.addEventListener("click", function () {
-    markdownInput.value = SAMPLE_MARKDOWN;
-    updateResult();
-    markdownInput.focus();
-    showToast("예시를 불러왔어요.");
+    applySource(SAMPLE_MARKDOWN, {
+      showResult: true,
+      message: "예시를 불러왔어요.",
+      undoMessage: "예시로 바꿨어요."
+    });
   });
 
   pasteButton.addEventListener("click", async function () {
@@ -263,10 +474,11 @@ const message = "코드 내용은 그대로 남아요.";
         showToast("클립보드가 비어 있어요.");
         return;
       }
-      markdownInput.value = clipboardText;
-      updateResult();
-      markdownInput.focus();
-      showToast("붙여넣었어요.");
+      applySource(clipboardText, {
+        showResult: true,
+        message: "붙여넣고 바로 정리했어요.",
+        undoMessage: "새 내용을 붙여넣고 정리했어요."
+      });
     } catch (_error) {
       markdownInput.focus();
       showToast("입력칸을 누르고 Ctrl+V로 붙여넣어 주세요.");
@@ -274,22 +486,54 @@ const message = "코드 내용은 그대로 남아요.";
   });
 
   clearButton.addEventListener("click", function () {
+    const previous = captureState();
     markdownInput.value = "";
-    updateResult();
+    renderResult("", { animate: false });
+    setMobileView("source");
     markdownInput.focus();
-    showToast("입력 내용을 비웠어요.");
+    showUndoToast("입력 내용을 비웠어요.", previous);
   });
 
-  copyButton.addEventListener("click", async function () {
-    try {
-      await copyText(cleanOutput.value);
-      showToast("클린 텍스트를 복사했어요.");
-    } catch (_error) {
-      cleanOutput.focus();
-      cleanOutput.select();
-      showToast("결과를 선택했어요. Ctrl+C로 복사해 주세요.");
-    }
+  resetOutputButton.addEventListener("click", function () {
+    const result = stripMarkdown(markdownInput.value);
+    cleanOutput.value = result;
+    outputCount.textContent = formatCount(result);
+    setCopyDisabled(result.length === 0);
+    setOutputMode(false);
+    triggerEraseAnimation();
+    showToast("자동 변환본으로 되돌렸어요.");
   });
 
-  updateResult();
+  copyButtons.forEach(function (button) {
+    button.addEventListener("click", handleCopy);
+  });
+
+  sourceTabButton.addEventListener("click", function () {
+    setMobileView("source", { focus: true });
+  });
+
+  resultTabButton.addEventListener("click", function () {
+    setMobileView("result", { focus: true });
+  });
+
+  function handleWorkspaceBreakpoint() {
+    setMobileView(mobileView);
+  }
+
+  if (mobileWorkspaceQuery.addEventListener) {
+    mobileWorkspaceQuery.addEventListener("change", handleWorkspaceBreakpoint);
+  } else {
+    mobileWorkspaceQuery.addListener(handleWorkspaceBreakpoint);
+  }
+
+  renderResult("", { animate: false });
+  setMobileView("source");
+
+  if (!reducedMotionQuery.matches) {
+    heroTimer = window.setInterval(cycleHeroExample, 2900);
+  }
+
+  window.addEventListener("pagehide", function () {
+    window.clearInterval(heroTimer);
+  }, { once: true });
 })(typeof globalThis !== "undefined" ? globalThis : this);
