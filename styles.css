@@ -352,6 +352,12 @@ textarea::placeholder {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.78;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+#cleanOutput:focus {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(112, 81, 214, 0.14);
 }
 
 .panel-footer {
@@ -395,6 +401,16 @@ textarea::placeholder {
   background: var(--success);
   border-radius: 50%;
   box-shadow: 0 0 0 3px rgba(36, 138, 98, 0.1);
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.auto-label.edited {
+  color: var(--accent-dark);
+}
+
+.auto-label.edited .status-dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(112, 81, 214, 0.1);
 }
 
 .flow-mark {
